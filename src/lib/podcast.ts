@@ -1,19 +1,25 @@
-import { XMLParser } from 'fast-xml-parser';
+import { XMLParser } from "fast-xml-parser";
 
-type FeedValue = string | number | boolean | null | undefined | { '#text'?: string; __cdata?: string };
+type FeedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | { "#text"?: string; __cdata?: string };
 
 interface RawFeedItem {
   title?: FeedValue;
   description?: FeedValue;
   link?: FeedValue;
-  guid?: FeedValue | { '#text'?: string };
+  guid?: FeedValue | { "#text"?: string };
   pubDate?: FeedValue;
   enclosure?: {
     url?: string;
   };
-  'itunes:summary'?: FeedValue;
-  'itunes:duration'?: FeedValue;
-  'itunes:image'?: {
+  "itunes:summary"?: FeedValue;
+  "itunes:duration"?: FeedValue;
+  "itunes:image"?: {
     href?: string;
   };
 }
@@ -27,7 +33,7 @@ interface RawFeedChannel {
   image?: {
     url?: FeedValue;
   };
-  'itunes:image'?: {
+  "itunes:image"?: {
     href?: string;
   };
   item?: RawFeedItem | RawFeedItem[];
@@ -67,46 +73,50 @@ export interface PodcastData {
 
 const parser = new XMLParser({
   ignoreAttributes: false,
-  attributeNamePrefix: '',
-  cdataPropName: '__cdata',
+  attributeNamePrefix: "",
+  cdataPropName: "__cdata",
   parseTagValue: false,
   trimValues: true,
 });
 
 function readValue(value: FeedValue): string {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  if (typeof value === 'object') {
-    if (typeof value.__cdata === 'string') return value.__cdata;
-    if (typeof value['#text'] === 'string') return value['#text'];
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
+  if (typeof value === "object") {
+    if (typeof value.__cdata === "string") return value.__cdata;
+    if (typeof value["#text"] === "string") return value["#text"];
   }
 
-  return '';
+  return "";
 }
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function slugify(input: string): string {
   return input
     .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[^\w\s-]/g, '')
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
     .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }
 
 function getSlugFromEpisodeUrl(episodeUrl: string): string {
   try {
     const pathname = new URL(episodeUrl).pathname;
-    const parts = pathname.split('/').filter(Boolean);
-    const lastPart = parts[parts.length - 1] ?? '';
+    const parts = pathname.split("/").filter(Boolean);
+    const lastPart = parts[parts.length - 1] ?? "";
     return slugify(lastPart);
   } catch {
-    return '';
+    return "";
   }
 }
 
@@ -120,7 +130,7 @@ function uniqueBySlug(items: PodcastEpisode[]): PodcastEpisode[] {
   const output: PodcastEpisode[] = [];
 
   for (const item of items) {
-    let candidate = item.slug || 'episode';
+    let candidate = item.slug || "episode";
     let suffix = 2;
 
     while (seen.has(candidate)) {
@@ -135,13 +145,18 @@ function uniqueBySlug(items: PodcastEpisode[]): PodcastEpisode[] {
   return output;
 }
 
-export async function getPodcastData(feedUrl = import.meta.env.RSS_FEED_URL): Promise<PodcastData> {
+export async function getPodcastData(
+  feedUrl = import.meta.env.RSS_FEED_URL,
+): Promise<PodcastData> {
   if (!feedUrl) {
-    throw new Error('Missing RSS_FEED_URL environment variable.');
+    throw new Error("Missing RSS_FEED_URL environment variable.");
   }
 
   const response = await fetch(feedUrl, {
-    headers: { 'User-Agent': 'DinosaurStoriesBot/1.0 (+https://dinosaur-stories.example.com)' },
+    headers: {
+      "User-Agent":
+        "DinosaurStoriesBot/1.0 (+https://dinosaur-stories.example.com)",
+    },
   });
 
   if (!response.ok) {
@@ -153,24 +168,30 @@ export async function getPodcastData(feedUrl = import.meta.env.RSS_FEED_URL): Pr
   const channel = parsed.rss?.channel;
 
   if (!channel) {
-    throw new Error('RSS feed channel missing.');
+    throw new Error("RSS feed channel missing.");
   }
 
-  const rawItems = Array.isArray(channel.item) ? channel.item : channel.item ? [channel.item] : [];
+  const rawItems = Array.isArray(channel.item)
+    ? channel.item
+    : channel.item
+      ? [channel.item]
+      : [];
 
   const podcast: PodcastMetadata = {
-    title: readValue(channel.title) || 'Dinosaur Stories',
-    description: readValue(channel.description) || 'Dinosaur Stories podcast episodes.',
+    title: readValue(channel.title) || "Dinosaur Stories Podcast",
+    description:
+      readValue(channel.description) || "Dinosaur Stories podcast episodes.",
     websiteUrl: readValue(channel.link),
-    imageUrl: channel['itunes:image']?.href ?? readValue(channel.image?.url),
-    language: readValue(channel.language) || 'en',
+    imageUrl: channel["itunes:image"]?.href ?? readValue(channel.image?.url),
+    language: readValue(channel.language) || "en",
     updatedAt: validDate(readValue(channel.lastBuildDate), new Date()),
   };
 
   const episodes = uniqueBySlug(
     rawItems.map((item, index) => {
       const title = readValue(item.title) || `Episode ${index + 1}`;
-      const descriptionHtml = readValue(item.description) || readValue(item['itunes:summary']);
+      const descriptionHtml =
+        readValue(item.description) || readValue(item["itunes:summary"]);
       const descriptionText = stripHtml(descriptionHtml);
       const episodeUrl = readValue(item.link);
       const slugFromUrl = getSlugFromEpisodeUrl(episodeUrl);
@@ -182,9 +203,9 @@ export async function getPodcastData(feedUrl = import.meta.env.RSS_FEED_URL): Pr
         descriptionHtml,
         descriptionText,
         episodeUrl,
-        audioUrl: item.enclosure?.url ?? '',
-        imageUrl: item['itunes:image']?.href ?? podcast.imageUrl,
-        duration: readValue(item['itunes:duration']),
+        audioUrl: item.enclosure?.url ?? "",
+        imageUrl: item["itunes:image"]?.href ?? podcast.imageUrl,
+        duration: readValue(item["itunes:duration"]),
         publishedAt: validDate(readValue(item.pubDate), new Date()),
       };
     }),
@@ -194,10 +215,10 @@ export async function getPodcastData(feedUrl = import.meta.env.RSS_FEED_URL): Pr
 }
 
 export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
+  return new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   }).format(date);
 }
 
@@ -205,7 +226,26 @@ export function toIsoDate(date: Date): string {
   return date.toISOString();
 }
 
-export function buildCanonicalUrl(site: URL | undefined, pathname: string): string {
+export function buildCanonicalUrl(
+  site: URL | undefined,
+  pathname: string,
+): string {
   if (!site) return pathname;
   return new URL(pathname, site).toString();
+}
+
+/**
+ * Prefer the per-episode Spotify URL from the RSS item (`link`), which points at
+ * the episode on Spotify / Podcasters. Fall back to the show URL from env when missing.
+ */
+export function getSpotifyListenUrl(
+  episode: PodcastEpisode,
+  showUrlFromEnv: string,
+): string {
+  const show = showUrlFromEnv.trim();
+  const episodeLink = episode.episodeUrl?.trim() ?? "";
+  if (episodeLink && /spotify\.com/i.test(episodeLink)) {
+    return episodeLink;
+  }
+  return show;
 }

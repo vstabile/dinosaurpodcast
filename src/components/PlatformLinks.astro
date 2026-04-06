@@ -1,0 +1,33 @@
+---
+import PlatformIcon from './PlatformIcon.astro';
+import { getPodcastPlatforms } from '../lib/platforms';
+
+interface Props {
+  variant?: 'hero' | 'inline' | 'footer';
+}
+
+const { variant = 'inline' } = Astro.props;
+const platforms = getPodcastPlatforms();
+---
+
+{
+  platforms.length > 0 ? (
+    <div class:list={['platform-strip', `platform-strip--${variant}`]}>
+      <ul class="platform-strip__list" role="list">
+        {platforms.map((p) => (
+          <li>
+            <a
+              class:list={['platform-btn', `platform-btn--${p.id}`]}
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={p.label}
+            >
+              <PlatformIcon id={p.id} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : null
+}

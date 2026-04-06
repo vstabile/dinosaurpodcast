@@ -1,5 +1,13 @@
 ---
-import { buildCanonicalUrl, formatDate, getPodcastData, toIsoDate, type PodcastEpisode, type PodcastMetadata } from '../../lib/podcast';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  buildCanonicalUrl,
+  getPodcastData,
+  getSpotifyListenUrl,
+  toIsoDate,
+  type PodcastEpisode,
+  type PodcastMetadata,
+} from '../../lib/podcast';
 
 interface Props {
   episode: PodcastEpisode;
@@ -19,68 +27,68 @@ const { episode, podcast } = Astro.props as Props;
 const pageTitle = `${episode.title} | ${podcast.title}`;
 const pageDescription = episode.descriptionText.slice(0, 160);
 const canonicalUrl = buildCanonicalUrl(Astro.site, `/episodes/${episode.slug}/`);
+const spotifyShowUrl = String(import.meta.env.SPOTIFY_URL ?? '').trim();
+const listenOnSpotifyUrl = getSpotifyListenUrl(episode, spotifyShowUrl);
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{pageTitle}</title>
-    <meta name="description" content={pageDescription} />
-    <link rel="canonical" href={canonicalUrl} />
-    <meta property="og:type" content="article" />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={pageDescription} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={episode.imageUrl} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={pageDescription} />
-    <meta name="twitter:image" content={episode.imageUrl} />
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'PodcastEpisode',
-        name: episode.title,
-        description: pageDescription,
-        url: canonicalUrl,
-        datePublished: toIsoDate(episode.publishedAt),
-        associatedMedia: episode.audioUrl
-          ? {
-              '@type': 'MediaObject',
-              contentUrl: episode.audioUrl,
-              encodingFormat: 'audio/m4a',
-            }
-          : undefined,
-        partOfSeries: {
-          '@type': 'PodcastSeries',
-          name: podcast.title,
-          url: buildCanonicalUrl(Astro.site, '/'),
-        },
-        image: episode.imageUrl,
-      })}
-    />
-  </head>
-  <body>
-    <main>
-      <p><a href="/">All episodes</a></p>
-      <article>
-        <header>
-          <h1>{episode.title}</h1>
-          <p>
-            <time datetime={toIsoDate(episode.publishedAt)}>{formatDate(episode.publishedAt)}</time>
-            {episode.duration ? ` · ${episode.duration}` : ''}
-          </p>
-          {episode.imageUrl ? <img src={episode.imageUrl} alt={episode.title} loading="eager" /> : null}
-        </header>
-        <section set:html={episode.descriptionHtml} />
-        {episode.audioUrl ? <p><a href={episode.audioUrl}>Listen to this episode audio</a></p> : null}
-        {episode.episodeUrl ? <p><a href={episode.episodeUrl}>View original episode page</a></p> : null}
-      </article>
-    </main>
-  </body>
-</html>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={canonicalUrl}
+  ogImage={episode.imageUrl}
+  ogType="article"
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'PodcastEpisode',
+    name: episode.title,
+    description: pageDescription,
+    url: canonicalUrl,
+    datePublished: toIsoDate(episode.publishedAt),
+    associatedMedia: episode.audioUrl
+      ? {
+          '@type': 'MediaObject',
+          contentUrl: episode.audioUrl,
+          encodingFormat: 'audio/m4a',
+        }
+      : undefined,
+    partOfSeries: {
+      '@type': 'PodcastSeries',
+      name: podcast.title,
+      url: buildCanonicalUrl(Astro.site, '/'),
+    },
+    image: episode.imageUrl,
+  }}
+>
+  <p class="back-link">
+    <a href="/">← All episodes</a>
+  </p>
+  
+  <article class="episode-article">
+    <header class="episode-article__header">
+      <h1>{episode.title}</h1>
+    </header>
+    {
+      episode.imageUrl ? (
+        <div class="episode-article__cover">
+          <img src={episode.imageUrl} alt={episode.title} loading="eager" width="1200" height="400" />
+        </div>
+      ) : null
+    }
+    <section class="episode-body" set:html={episode.descriptionHtml} />
+    {
+      listenOnSpotifyUrl ? (
+        <div class="episode-actions">
+          <a class="btn btn--spotify" href={listenOnSpotifyUrl} target="_blank" rel="noopener noreferrer">
+            <svg class="btn--spotify__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+              <path
+                fill="currentColor"
+                d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.398.119-.779-.18-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.261 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"
+              />
+            </svg>
+            Listen on Spotify
+          </a>
+        </div>
+      ) : null
+    }
+  </article>
+</BaseLayout>
