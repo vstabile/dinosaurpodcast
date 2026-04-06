@@ -1,0 +1,19 @@
+{
+  "name": "dinosaurpodcast",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": "^20.3.0 || >=22.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.1.6",
+    "astro": "^4.13.1",
+    "fast-xml-parser": "^5.5.10"
+  }
+}

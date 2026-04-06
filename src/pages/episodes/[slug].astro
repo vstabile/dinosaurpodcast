@@ -1,0 +1,86 @@
+---
+import { buildCanonicalUrl, formatDate, getPodcastData, toIsoDate, type PodcastEpisode, type PodcastMetadata } from '../../lib/podcast';
+
+interface Props {
+  episode: PodcastEpisode;
+  podcast: PodcastMetadata;
+}
+
+export async function getStaticPaths() {
+  const { podcast, episodes } = await getPodcastData();
+
+  return episodes.map((episode) => ({
+    params: { slug: episode.slug },
+    props: { episode, podcast },
+  }));
+}
+
+const { episode, podcast } = Astro.props as Props;
+const pageTitle = `${episode.title} | ${podcast.title}`;
+const pageDescription = episode.descriptionText.slice(0, 160);
+const canonicalUrl = buildCanonicalUrl(Astro.site, `/episodes/${episode.slug}/`);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={episode.imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={episode.imageUrl} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'PodcastEpisode',
+        name: episode.title,
+        description: pageDescription,
+        url: canonicalUrl,
+        datePublished: toIsoDate(episode.publishedAt),
+        associatedMedia: episode.audioUrl
+          ? {
+              '@type': 'MediaObject',
+              contentUrl: episode.audioUrl,
+              encodingFormat: 'audio/m4a',
+            }
+          : undefined,
+        partOfSeries: {
+          '@type': 'PodcastSeries',
+          name: podcast.title,
+          url: buildCanonicalUrl(Astro.site, '/'),
+        },
+        image: episode.imageUrl,
+      })}
+    />
+  </head>
+  <body>
+    <main>
+      <p><a href="/">All episodes</a></p>
+      <article>
+        <header>
+          <h1>{episode.title}</h1>
+          <p>
+            <time datetime={toIsoDate(episode.publishedAt)}>{formatDate(episode.publishedAt)}</time>
+            {episode.duration ? ` · ${episode.duration}` : ''}
+          </p>
+          {episode.imageUrl ? <img src={episode.imageUrl} alt={episode.title} loading="eager" /> : null}
+        </header>
+        <section set:html={episode.descriptionHtml} />
+        {episode.audioUrl ? <p><a href={episode.audioUrl}>Listen to this episode audio</a></p> : null}
+        {episode.episodeUrl ? <p><a href={episode.episodeUrl}>View original episode page</a></p> : null}
+      </article>
+    </main>
+  </body>
+</html>

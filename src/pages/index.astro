@@ -1,0 +1,73 @@
+---
+import { buildCanonicalUrl, formatDate, getPodcastData, toIsoDate } from '../lib/podcast';
+
+const { podcast, episodes } = await getPodcastData();
+const pageTitle = `${podcast.title} | Official Podcast Episodes`;
+const pageDescription =
+  podcast.description ||
+  'Explore all Dinosaur Stories episodes, from T. rex to Velociraptor, with science-based storytelling.';
+const canonicalUrl = buildCanonicalUrl(Astro.site, '/');
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={podcast.imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={podcast.imageUrl} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'PodcastSeries',
+        name: podcast.title,
+        description: pageDescription,
+        url: canonicalUrl,
+        inLanguage: podcast.language,
+        image: podcast.imageUrl,
+        dateModified: toIsoDate(podcast.updatedAt),
+      })}
+    />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>{podcast.title}</h1>
+        <p>{pageDescription}</p>
+      </header>
+      <section aria-label="All episodes">
+        <ul>
+          {
+            episodes.map((episode) => (
+              <li>
+                <article>
+                  <h2>
+                    <a href={`/episodes/${episode.slug}/`}>{episode.title}</a>
+                  </h2>
+                  <p>
+                    <time datetime={toIsoDate(episode.publishedAt)}>{formatDate(episode.publishedAt)}</time>
+                    {episode.duration ? ` · ${episode.duration}` : ''}
+                  </p>
+                  <p>{episode.descriptionText}</p>
+                </article>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
