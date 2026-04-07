@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildCanonicalUrl } from '../../lib/podcast';
+
+const canonicalUrl = buildCanonicalUrl(Astro.site, '/');
+const pageTitle = '5 Best Dinosaur Podcasts You Should Be Listening To';
+const pageDescription = 'Find out the top 5 podcasts about dinosaurs and paleontology';
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={canonicalUrl}
+  ogType="article"
+>
+  <p class="back-link">
+    <a href="/">← All episodes</a>
+  </p>
+  
+  <article class="episode-article">
+    <header class="episode-article__header">
+      <h1>{pageTitle}</h1>
+      <p>Podcasts are one of the best ways to explore the prehistoric world. Whether you're looking for scientific deep dives, expert interviews, or immersive storytelling, these are the <strong>top dinosaur podcasts you should be listening to right now</strong>.
+  </p>
+    <a href="https://iknowdino.com/" target="_blank">
+        <h2>1. I Know Dino: The Big Dinosaur Podcast</h2>
+        <img src="/img/i-know-dino.jpeg" class="podcast-thumb" alt="I Know Dino Podcast Logo" />
+    </a>
+    <p>
+        One of the most established dinosaur podcasts, <em>I Know Dino</em> delivers consistent, high-quality episodes covering
+        the latest paleontology news, dinosaur facts, and expert interviews. With a long track record and a loyal audience,
+        it’s a go-to resource for anyone who wants to stay up to date with discoveries in the field.
+    </p>
+    <p><strong>Best for:</strong> News, weekly updates, and comprehensive dinosaur coverage</p>
+
+    <a href="https://terriblelizards.libsyn.com/" target="_blank">
+        <h2>2. Terrible Lizards</h2>
+        <img src="/img/terrible-lizards.jpeg" class="podcast-thumb" alt="Terrible Lizards Podcast Logo"/>
+    </a>
+    <p>
+        Hosted by a paleontologist and a comedian, <em>Terrible Lizards</em> strikes a great balance between scientific accuracy
+        and entertainment. The conversational format makes complex topics easy to understand, while still diving deep into
+        fascinating questions about dinosaur biology and behavior.
+    </p>
+    <p><strong>Best for:</strong> Engaging discussions with a mix of science and humor</p>
+
+    <a href="/" target="_blank">
+        <h2>3. Dinosaur Stories Podcast</h2>
+        <img src="/logo.jpg" class="podcast-thumb" alt="Dinosaur Stories Podcast Logo"/>
+    </a>
+    <p>
+        If you’re looking for a more immersive experience, <em>Dinosaur Stories Podcast</em> offers a fresh take on prehistoric
+        life through storytelling. Each episode focuses on a specific dinosaur—like <em>Tyrannosaurus rex</em>—and blends modern
+        scientific understanding with vivid, narrative-driven conversations.
+    </p>
+    <p>
+        Instead of just listing facts, the show brings dinosaurs to life, helping listeners imagine how these incredible
+        creatures lived, hunted, and survived. It’s an excellent choice for both newcomers and enthusiasts who want something
+        more cinematic and engaging.
+    </p>
+    <p><strong>Best for:</strong> Story-driven, entertaining, and educational dinosaur episodes</p>
+
+    <a href="https://www.paleonerds.com/" target="_blank">
+        <h2>4. Paleo Nerds</h2>
+        <img src="/img/paleo-nerds.jpeg" class="podcast-thumb" alt="Paleo Nerds Podcast Logo"/>
+    </a>
+    <p>
+        <em>Paleo Nerds</em> focuses on interviews with scientists, authors, and creators in the world of paleontology. It offers
+        valuable insights into the people behind the discoveries, making it a great podcast for listeners who want a deeper
+        understanding of the science and research process.
+    </p>
+    <p><strong>Best for:</strong> Interviews and behind-the-scenes paleontology</p>
+
+    <a href="https://chasmosaurs.com/">
+        <h2>5. Love in the Time of Chasmosaurs</h2>
+        <img src="/img/chasmosaurs.jpg" class="podcast-thumb" alt="Love in the Time of Chasmosaurs Podcast Logo"/>
+    </a>
+    <p>
+        This podcast explores the intersection of dinosaurs, science, and culture. From paleoart to books and media,
+        <em>Love in the Time of Chasmosaurs</em> offers a unique perspective that goes beyond fossils and into how we imagine
+        and represent prehistoric life.
+    </p>
+    <p><strong>Best for:</strong> Dinosaur culture, paleoart, and creative discussions</p>
+
+    <h2 style="margin-top: 2rem">Final Thoughts</h2>
+    <p>
+        The world of dinosaur podcasts is growing, but each show brings something different to the table. Whether you prefer
+        scientific updates, expert interviews, or immersive storytelling, there’s never been a better time to explore the age
+        of dinosaurs.
+    </p>
+    <p>
+        If you're just getting started, <em>Dinosaur Stories Podcast</em> is a great entry point—combining accurate science with
+        compelling storytelling that makes prehistoric life feel more real than ever.
+    </p>
+
+    </header>
+  </article>
+</BaseLayout>
