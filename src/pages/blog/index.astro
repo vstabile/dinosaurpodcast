@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildCanonicalUrl } from '../../lib/podcast';
+
+const canonicalUrl = buildCanonicalUrl(Astro.site, '/blog/');
+const pageTitle = 'Dinosaur Stories Blog';
+const pageDescription = 'Articles about dinosaur related content and products for paleontology lovers.';
+
+const posts = [
+  {
+    href: '/blog/top-5-dinosaur-podcasts/',
+    title: '5 Best Dinosaur Podcasts You Should Be Listening To',
+    description: 'A curated list of top dinosaur and paleontology podcasts for science fans and curious listeners.',
+  },
+  {
+    href: '/blog/top-5-dinosaur-model-brands/',
+    title: '5 Best Scientifically Accurate Dinosaur Model Brands',
+    description: 'A practical guide to the best dinosaur model brands based on realism and paleontology accuracy.',
+  },
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} canonicalUrl={canonicalUrl} ogType="website">
+  <section class="page-hero" aria-label="Blog hero">
+    <h1>{pageTitle}</h1>
+    <p class="lead">{pageDescription}</p>
+  </section>
+
+  <section aria-label="Blog articles">
+    <ul class="article-list">
+      {
+        posts.map((post) => (
+          <li>
+            <article class="article-card">
+              <div class="article-card__body" style="border-left: none;">
+                <h2>
+                  <a href={post.href}>{post.title}</a>
+                </h2>
+                <p class="article-excerpt">{post.description}</p>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

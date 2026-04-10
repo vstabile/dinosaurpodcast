@@ -611,3 +611,112 @@ body {
     width: 6rem;
   }
 }
+
+/* Article list */
+.article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--line-subtle);
+  border: 1px solid var(--line-subtle);
+}
+
+.article-card {
+  display: grid;
+  gap: 0;
+  background: var(--bg-elevated);
+  transition: background 0.15s ease;
+}
+
+.article-card:hover {
+  background: #fafbfc;
+}
+
+.article-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(145deg, #e0f2fe, #bae6fd);
+}
+
+.article-card__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.article-card__media--placeholder {
+  aspect-ratio: 1 / 1;
+}
+
+.article-card__body {
+  padding: 1.125rem 1.25rem 1.25rem;
+  border-left: 1px solid var(--line-subtle);
+}
+
+@media (max-width: 559px) {
+  .article-card__body {
+    border-left: none;
+    border-top: 1px solid var(--line-subtle);
+  }
+}
+
+@media (min-width: 560px) {
+  .article-card__body {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+.article-card__body h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.article-card__body h2 a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.article-card__body h2 a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent-bright);
+}
+
+.article-meta {
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.article-meta time {
+  color: var(--forest);
+}
+
+.article-excerpt {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
