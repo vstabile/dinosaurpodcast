@@ -24,7 +24,7 @@ export async function getStaticPaths() {
 }
 
 const { episode, podcast } = Astro.props as Props;
-const pageTitle = `${episode.title} | ${podcast.title}`;
+const pageTitle = `${episode.title} | ${podcast.title} Podcast`;
 const pageDescription = episode.descriptionText.slice(0, 160);
 const canonicalUrl = buildCanonicalUrl(Astro.site, `/episodes/${episode.slug}/`);
 const spotifyShowUrl = String(import.meta.env.SPOTIFY_URL ?? '').trim();
